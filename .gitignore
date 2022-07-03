@@ -11,3 +11,5 @@ Infrastructure/obj/
 *.user
 WkRecruitmentAssignment/bin/
 WkRecruitmentAssignment/obj/
+Tests/bin/
+Tests/obj/
