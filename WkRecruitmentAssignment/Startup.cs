@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MediatR;
 using System.Linq;
+using WebApi.Middlewares;
 
 namespace WebApi
 {
@@ -55,6 +56,7 @@ namespace WebApi
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WkRecruitmentAssignment v1"));
             }
 
+            app.UseMiddleware<UserIdHeaderMiddleware>();
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
