@@ -13,6 +13,8 @@ using Microsoft.OpenApi.Models;
 using MediatR;
 using System.Linq;
 using WebApi.Middlewares;
+using System;
+using WebApi.Controllers.Order;
 
 namespace WebApi
 {
@@ -39,6 +41,13 @@ namespace WebApi
             services.AddSingleton<IDiscountVoucherRepository, DiscountVoucherRepository>();
 
             services.AddScoped<IActionContextProvider, ActionContextProvider>();
+
+            AddMappers(services);
+        }
+
+        private void AddMappers(IServiceCollection services)
+        {
+            services.AddScoped<ICreateOrderRequsestMapper, CreateOrderRequsestMapper>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
