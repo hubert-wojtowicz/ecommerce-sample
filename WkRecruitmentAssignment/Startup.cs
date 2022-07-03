@@ -15,6 +15,7 @@ using System.Linq;
 using WebApi.Middlewares;
 using System;
 using WebApi.Controllers.Order;
+using Domain.Order;
 
 namespace WebApi
 {
@@ -39,6 +40,7 @@ namespace WebApi
             services.AddSingleton<IShoppingCartRepository, ShoppingCartRepository>();
             services.AddSingleton<IProductRepository, ProductRepository>();
             services.AddSingleton<IDiscountVoucherRepository, DiscountVoucherRepository>();
+            services.AddSingleton<IOrderRepository, OrderRepository>();
 
             services.AddScoped<IActionContextProvider, ActionContextProvider>();
 

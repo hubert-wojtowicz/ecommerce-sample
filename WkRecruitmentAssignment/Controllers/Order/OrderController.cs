@@ -20,16 +20,15 @@ namespace WebApi.Controllers.Order
         }
 
         [HttpPost("Create")]
-        public async Task<Guid> Create([FromBody] CreateOrderRequestModel request)
+        public async Task Create([FromBody] CreateOrderRequestModel request)
         {
+            // TODO: extend input validation with FluentValidation
             if (!Enum.TryParse(request.PaymentMethod, out PaymentMethod paymentMethodEnum))
             {
                 throw new ArgumentException("Wrong payment method value.");
             }
 
-            var response = await _mediator.Send(_requestMapper.Map(request));
-
-            return Guid.NewGuid();
+            await _mediator.Send(_requestMapper.Map(request));
         }
     }
 }

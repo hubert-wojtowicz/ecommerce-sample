@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Common.Domain.User.ValueObjects;
 using Domain.ShoppingCart;
@@ -16,7 +14,7 @@ namespace Infrastructure.Repositories
             Collection.Add(new ShoppingCart(UserId.CreateOrNull(Guid.Parse("f91a6abd-2f61-4549-95f0-0527c69189f4"))));
         }
 
-        async Task<ShoppingCart> IShoppingCartRepository.GetByUserIdAsync(UserId userId)
+        public async Task<ShoppingCart> GetByUserIdAsync(UserId userId)
         {
             var shoppingCart = Collection.SingleOrDefault(x => x.UserId.Equals(userId));
             if (shoppingCart is null)
