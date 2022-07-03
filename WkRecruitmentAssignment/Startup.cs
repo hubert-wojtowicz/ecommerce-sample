@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MediatR;
+using System.Linq;
 
 namespace WebApi
 {
@@ -22,7 +23,7 @@ namespace WebApi
         }
 
         public IConfiguration Configuration { get; }
-        
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
@@ -38,9 +39,15 @@ namespace WebApi
 
             services.AddScoped<IActionContextProvider, ActionContextProvider>();
         }
-        
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var validCorsOrigins = Configuration.GetSection("CorsOrigins").GetChildren().Select(x => x.Value).ToArray();
+            app.UseCors(options => options
+                .WithOrigins(validCorsOrigins)
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
