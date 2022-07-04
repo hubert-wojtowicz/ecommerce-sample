@@ -6,5 +6,6 @@ namespace Domain.Order
 {
     public interface IOrderRepository : IRepository<Order, OrderId>
     {
+        Task<int> GetNextOrderNumber();
     }
 }

@@ -17,10 +17,10 @@ namespace Infrastructure.Repositories
         protected Repository()
         {
         }
-        
+
         public async ValueTask InsertAsync(TAggregateRoot aggregateRoot) => Collection.Add(aggregateRoot);
 
-        public async ValueTask<TAggregateRoot> GetAsync(TId id) 
+        public async ValueTask<TAggregateRoot> GetAsync(TId id)
             => await GetOrNullAsync(id) ?? throw new ApplicationException("Object not found.");
 
         public async ValueTask<TAggregateRoot> GetOrNullAsync(TId id) => Collection.SingleOrDefault(x => x.Id.Equals(id));

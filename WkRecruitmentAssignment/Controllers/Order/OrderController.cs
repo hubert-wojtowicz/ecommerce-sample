@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
-using Application.Order.Create;
 using MediatR;
+using Domain.Common;
 
 namespace WebApi.Controllers.Order
 {

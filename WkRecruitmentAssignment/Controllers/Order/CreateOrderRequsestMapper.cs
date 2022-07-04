@@ -1,4 +1,5 @@
 ﻿using Application.Order.Create;
+using Domain.Common;
 using System;
 
 namespace WebApi.Controllers.Order

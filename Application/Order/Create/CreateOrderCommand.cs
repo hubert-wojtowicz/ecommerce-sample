@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Domain.Common;
+using MediatR;
 using System;
 
 namespace Application.Order.Create
@@ -15,11 +16,5 @@ namespace Application.Order.Create
             PaymentMethod = paymentMethod;
             Remarks = remarks;
         }
-    }
-
-    public enum PaymentMethod
-    {
-        BankTransfer,
-        CreditCard
     }
 }

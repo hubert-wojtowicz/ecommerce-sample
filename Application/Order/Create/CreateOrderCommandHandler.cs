@@ -1,13 +1,11 @@
 ﻿using Common.Domain.ActionContext;
-using Domain.Common;
 using Domain.DiscountVoucher;
 using Domain.Order;
 using Domain.Product;
-using Domain.Product.ValueObjects;
 using Domain.ShoppingCart;
+using Domain.ShoppingCartSnapshot;
 using MediatR;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,6 +13,7 @@ namespace Application.Order.Create
 {
     public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand>
     {
+        private readonly IShoppingCartSnapshotRepository _shoppingCartSnapshotRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly IDiscountVoucherRepository _discountVoucherRepository;
         private readonly IShoppingCartRepository _shoppingCartRepository;
@@ -22,12 +21,14 @@ namespace Application.Order.Create
         private readonly IProductRepository _productRepository;
 
         public CreateOrderCommandHandler(
+            IShoppingCartSnapshotRepository shoppingCartSnapshotRepository,
             IOrderRepository orderRepository,
             IDiscountVoucherRepository discountVoucherRepository,
             IShoppingCartRepository shoppingCartRepository,
             IActionContextProvider actionContextProvider,
             IProductRepository productRepository)
         {
+            _shoppingCartSnapshotRepository = shoppingCartSnapshotRepository;
             _orderRepository = orderRepository;
             _discountVoucherRepository = discountVoucherRepository;
             _shoppingCartRepository = shoppingCartRepository;
@@ -40,15 +41,24 @@ namespace Application.Order.Create
             if (command == null) throw new ArgumentNullException(nameof(command));
 
             var shoppingCart = await _shoppingCartRepository.GetByUserIdAsync(_actionContextProvider.ActionContext.UserId);
-            Dictionary<ProductId, Money> prices =  await shoppingCart.GetProductPrices(_productRepository);
-            var voucher = await _discountVoucherRepository.GetAsync(shoppingCart.DiscountVoucherId);
-
-            cancellationToken.ThrowIfCancellationRequested();
+            ShoppingCartSnapshot shoppingCartSnapshot = new();
+            await shoppingCartSnapshot.PopulateCartSnapshot(shoppingCart, _productRepository);
+            await _shoppingCartSnapshotRepository.InsertAsync(shoppingCartSnapshot);
 
             var order = new Domain.Order.Order();
-            await order.CreateOrder(shoppingCart, prices, voucher);
+            order.SetPaymentMethod(command.PaymentMethod);
+            order.SetRemarks(command.Remarks);
+
+            // start transaction scope
+            await order.Calculate(shoppingCartSnapshot, _productRepository, _discountVoucherRepository);
+            var orderNumber = await _orderRepository.GetNextOrderNumber();
+            order.SetOrderNumber(orderNumber);
             await _orderRepository.InsertAsync(order);
-            await _discountVoucherRepository.DeleteAsync(voucher);
+            shoppingCart.CleanCart();
+            //TODO: _discountVoucherRepository.Update(voucher);
+
+            // end transaction
+
             return Unit.Value;
         }
     }
